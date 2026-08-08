@@ -1,0 +1,2 @@
+-- Initial database schema setup for DevFlow
+-- Placeholder migration script
