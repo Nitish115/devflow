@@ -17,6 +17,10 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 server:
   port: 8081
@@ -24,4 +28,9 @@ server:
 jwt:
   secret: ${JWT_SECRET:dev_secret_key_change_in_production_environment_min_256_bits_length_123456}
   expiration: ${JWT_EXPIRATION_MS:86400000}
+
+app:
+  storage:
+    local-path: ${APP_STORAGE_LOCAL_PATH:./uploads}
+    max-file-size: 10485760 # 10MB in bytes
 
