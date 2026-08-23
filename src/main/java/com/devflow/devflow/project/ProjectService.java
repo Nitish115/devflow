@@ -9,6 +9,8 @@ import com.devflow.devflow.organization.OrganizationMember;
 import com.devflow.devflow.organization.OrganizationMemberRepository;
 import com.devflow.devflow.organization.OrganizationRepository;
 import com.devflow.devflow.project.dto.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectResponse createProject(Long orgId, CreateProjectRequest request, String userEmail) {
         User user = getUserByEmail(userEmail);
         Organization org = getOrganizationEntity(orgId);
@@ -61,6 +64,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "projects", key = "'org:' + #orgId + ':user:' + #userEmail")
     public List<ProjectResponse> getOrganizationProjects(Long orgId, String userEmail) {
         User user = getUserByEmail(userEmail);
         getOrganizationEntity(orgId);
@@ -74,6 +78,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "projects", key = "'id:' + #projectId + ':user:' + #userEmail")
     public ProjectResponse getProjectById(Long orgId, Long projectId, String userEmail) {
         User user = getUserByEmail(userEmail);
         getOrganizationEntity(orgId);
@@ -87,6 +92,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(value = "projects", allEntries = true)
     public ProjectMemberResponse addProjectMember(Long orgId, Long projectId, AddProjectMemberRequest request, String userEmail) {
         User currentUser = getUserByEmail(userEmail);
         getOrganizationEntity(orgId);
@@ -123,6 +129,7 @@ public class ProjectService {
     }
 
     @Transactional
+    @CacheEvict(value = "projects", allEntries = true)
     public void removeProjectMember(Long orgId, Long projectId, Long targetUserId, String userEmail) {
         User currentUser = getUserByEmail(userEmail);
         getOrganizationEntity(orgId);
@@ -137,6 +144,7 @@ public class ProjectService {
 
         projectMemberRepository.delete(targetMember);
     }
+
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
