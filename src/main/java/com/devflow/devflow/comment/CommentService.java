@@ -7,6 +7,9 @@ import com.devflow.devflow.comment.dto.CommentResponse;
 import com.devflow.devflow.comment.dto.CreateCommentRequest;
 import com.devflow.devflow.comment.dto.UpdateCommentRequest;
 import com.devflow.devflow.common.exception.*;
+import com.devflow.devflow.event.CommentCreatedEvent;
+import com.devflow.devflow.event.CommentMentionedEvent;
+import com.devflow.devflow.event.EventPublisher;
 import com.devflow.devflow.organization.OrganizationMember;
 import com.devflow.devflow.organization.OrganizationMemberRepository;
 import com.devflow.devflow.project.ProjectMember;
@@ -34,6 +37,7 @@ public class CommentService {
     private final ProjectMemberRepository projectMemberRepository;
     private final OrganizationMemberRepository organizationMemberRepository;
     private final UserRepository userRepository;
+    private final EventPublisher eventPublisher;
 
     public CommentService(CommentRepository commentRepository,
                           CommentMentionRepository commentMentionRepository,
@@ -41,7 +45,8 @@ public class CommentService {
                           ProjectService projectService,
                           ProjectMemberRepository projectMemberRepository,
                           OrganizationMemberRepository organizationMemberRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          EventPublisher eventPublisher) {
         this.commentRepository = commentRepository;
         this.commentMentionRepository = commentMentionRepository;
         this.taskRepository = taskRepository;
@@ -49,6 +54,7 @@ public class CommentService {
         this.projectMemberRepository = projectMemberRepository;
         this.organizationMemberRepository = organizationMemberRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -65,8 +71,32 @@ public class CommentService {
 
         List<Long> mentionedUserIds = processAndSaveMentions(savedComment, projectId, request.getContent());
 
+        eventPublisher.publishCommentCreated(new CommentCreatedEvent(
+                savedComment.getId(),
+                taskId,
+                projectId,
+                orgId,
+                currentUser.getId(),
+                currentUser.getEmail(),
+                savedComment.getContent()
+        ));
+
+        for (Long mentionedUserId : mentionedUserIds) {
+            eventPublisher.publishCommentMentioned(new CommentMentionedEvent(
+                    savedComment.getId(),
+                    taskId,
+                    projectId,
+                    orgId,
+                    currentUser.getId(),
+                    currentUser.getEmail(),
+                    mentionedUserId,
+                    savedComment.getContent()
+            ));
+        }
+
         return mapToCommentResponse(savedComment, mentionedUserIds);
     }
+
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getComments(Long orgId, Long projectId, Long taskId, String userEmail) {

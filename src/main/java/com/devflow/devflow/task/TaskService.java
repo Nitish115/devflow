@@ -4,6 +4,9 @@ import com.devflow.devflow.auth.Role;
 import com.devflow.devflow.auth.User;
 import com.devflow.devflow.auth.UserRepository;
 import com.devflow.devflow.common.exception.*;
+import com.devflow.devflow.event.EventPublisher;
+import com.devflow.devflow.event.TaskAssignedEvent;
+import com.devflow.devflow.event.TaskStatusChangedEvent;
 import com.devflow.devflow.organization.OrganizationMember;
 import com.devflow.devflow.organization.OrganizationMemberRepository;
 import com.devflow.devflow.project.Project;
@@ -26,17 +29,20 @@ public class TaskService {
     private final ProjectMemberRepository projectMemberRepository;
     private final OrganizationMemberRepository organizationMemberRepository;
     private final UserRepository userRepository;
+    private final EventPublisher eventPublisher;
 
     public TaskService(TaskRepository taskRepository,
                        ProjectService projectService,
                        ProjectMemberRepository projectMemberRepository,
                        OrganizationMemberRepository organizationMemberRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       EventPublisher eventPublisher) {
         this.taskRepository = taskRepository;
         this.projectService = projectService;
         this.projectMemberRepository = projectMemberRepository;
         this.organizationMemberRepository = organizationMemberRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -63,6 +69,19 @@ public class TaskService {
         );
 
         Task savedTask = taskRepository.save(task);
+
+        if (savedTask.getAssignee() != null) {
+            eventPublisher.publishTaskAssigned(new TaskAssignedEvent(
+                    savedTask.getId(),
+                    projectId,
+                    orgId,
+                    savedTask.getTitle(),
+                    savedTask.getAssignee().getId(),
+                    currentUser.getId(),
+                    currentUser.getEmail()
+            ));
+        }
+
         return mapToTaskResponse(savedTask);
     }
 
@@ -108,6 +127,8 @@ public class TaskService {
         projectService.validateProjectMembership(projectId, currentUser.getId());
 
         Task task = getTaskEntity(projectId, taskId);
+        TaskStatus oldStatus = task.getStatus();
+        Long oldAssigneeId = task.getAssignee() != null ? task.getAssignee().getId() : null;
 
         if (request.getTitle() != null && !request.getTitle().isBlank()) {
             task.setTitle(request.getTitle());
@@ -130,8 +151,38 @@ public class TaskService {
         }
 
         Task updatedTask = taskRepository.save(task);
+
+        Long newAssigneeId = updatedTask.getAssignee() != null ? updatedTask.getAssignee().getId() : null;
+        if (newAssigneeId != null && !newAssigneeId.equals(oldAssigneeId)) {
+            eventPublisher.publishTaskAssigned(new TaskAssignedEvent(
+                    updatedTask.getId(),
+                    projectId,
+                    orgId,
+                    updatedTask.getTitle(),
+                    newAssigneeId,
+                    currentUser.getId(),
+                    currentUser.getEmail()
+            ));
+        }
+
+        if (request.getStatus() != null && !oldStatus.equals(updatedTask.getStatus())) {
+            eventPublisher.publishTaskStatusChanged(new TaskStatusChangedEvent(
+                    updatedTask.getId(),
+                    projectId,
+                    orgId,
+                    updatedTask.getTitle(),
+                    oldStatus.name(),
+                    updatedTask.getStatus().name(),
+                    currentUser.getId(),
+                    currentUser.getEmail(),
+                    newAssigneeId,
+                    updatedTask.getCreatedBy().getId()
+            ));
+        }
+
         return mapToTaskResponse(updatedTask);
     }
+
 
     @Transactional
     public void deleteTask(Long orgId, Long projectId, Long taskId, String userEmail) {

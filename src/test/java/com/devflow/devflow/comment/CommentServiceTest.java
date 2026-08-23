@@ -14,6 +14,7 @@ import com.devflow.devflow.task.Task;
 import com.devflow.devflow.task.TaskPriority;
 import com.devflow.devflow.task.TaskRepository;
 import com.devflow.devflow.task.TaskStatus;
+import com.devflow.devflow.event.EventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,8 +55,12 @@ class CommentServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private CommentService commentService;
+
 
     private User ownerUser;
     private User devUser;

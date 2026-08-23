@@ -9,6 +9,7 @@ import com.devflow.devflow.organization.OrganizationMember;
 import com.devflow.devflow.organization.OrganizationMemberRepository;
 import com.devflow.devflow.project.*;
 import com.devflow.devflow.task.dto.*;
+import com.devflow.devflow.event.EventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,8 +44,12 @@ class TaskServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private TaskService taskService;
+
 
     private User ownerUser;
     private User devUser;
