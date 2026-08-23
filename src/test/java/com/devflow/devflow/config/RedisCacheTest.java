@@ -109,10 +109,11 @@ class RedisCacheTest {
                 .thenReturn(new OrganizationMember(organization, devUser, Role.DEVELOPER));
         organizationService.addMember(10L, addRequest, "owner@example.com");
 
-        // Third call - cache was evicted, repository is invoked again
+        // Third call - cache was evicted, repository is invoked again (1st call + 1 in addMember + 3rd call = 3 total)
         organizationService.getOrganizationById(10L, "owner@example.com");
-        verify(organizationRepository, times(2)).findById(10L);
+        verify(organizationRepository, times(3)).findById(10L);
     }
+
 
     @Test
     void testProjectCachingAndEvictionOnProjectCreation() {
