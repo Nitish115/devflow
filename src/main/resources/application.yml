@@ -35,6 +35,10 @@ spring:
           max-interval: 10000ms
           multiplier: 2.0
         default-requeue-rejected: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 server:
   port: 8081
