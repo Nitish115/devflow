@@ -5,6 +5,9 @@ import com.devflow.devflow.auth.User;
 import com.devflow.devflow.auth.UserRepository;
 import com.devflow.devflow.common.exception.*;
 import com.devflow.devflow.organization.dto.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,7 @@ public class OrganizationService {
     }
 
     @Transactional
+    @CacheEvict(value = "organizations", key = "'user:' + #userEmail")
     public OrganizationResponse createOrganization(CreateOrganizationRequest request, String userEmail) {
         User user = getUserByEmail(userEmail);
 
@@ -40,6 +44,7 @@ public class OrganizationService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "organizations", key = "'user:' + #userEmail")
     public List<OrganizationResponse> getUserOrganizations(String userEmail) {
         User user = getUserByEmail(userEmail);
 
@@ -50,6 +55,7 @@ public class OrganizationService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "organizations", key = "'id:' + #orgId + ':user:' + #userEmail")
     public OrganizationResponse getOrganizationById(Long orgId, String userEmail) {
         User user = getUserByEmail(userEmail);
         Organization organization = getOrganizationEntity(orgId);
@@ -63,6 +69,7 @@ public class OrganizationService {
     }
 
     @Transactional
+    @CacheEvict(value = "organizations", allEntries = true)
     public OrganizationMemberResponse addMember(Long orgId, AddMemberRequest request, String userEmail) {
         User currentUser = getUserByEmail(userEmail);
         Organization organization = getOrganizationEntity(orgId);
@@ -83,6 +90,10 @@ public class OrganizationService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "organizations", allEntries = true),
+            @CacheEvict(value = "projects", allEntries = true)
+    })
     public OrganizationMemberResponse updateMemberRole(Long orgId, Long targetUserId, UpdateMemberRoleRequest request, String userEmail) {
         User currentUser = getUserByEmail(userEmail);
         getOrganizationEntity(orgId);
@@ -106,6 +117,10 @@ public class OrganizationService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "organizations", allEntries = true),
+            @CacheEvict(value = "projects", allEntries = true)
+    })
     public void removeMember(Long orgId, Long targetUserId, String userEmail) {
         User currentUser = getUserByEmail(userEmail);
         getOrganizationEntity(orgId);
@@ -124,6 +139,7 @@ public class OrganizationService {
 
         organizationMemberRepository.delete(targetMember);
     }
+
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
