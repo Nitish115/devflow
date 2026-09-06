@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: devflow-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-devflow_db}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: devflow-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  redis:
+    image: redis:7-alpine
+    container_name: devflow-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devflow-app
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-devflow_db}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS:-guest}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-dev_secret_key_change_in_production_environment_min_256_bits_length_123456}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      APP_STORAGE_LOCAL_PATH: /app/uploads
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
