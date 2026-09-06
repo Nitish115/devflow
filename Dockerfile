@@ -2,11 +2,8 @@
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /build
 
-# Copy pom.xml and pre-fetch dependencies for efficient Docker caching
+# Copy pom.xml and source code to build the executable JAR
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-# Copy source code and build the executable JAR
 COPY src ./src
 RUN mvn clean package -DskipTests
 
