@@ -41,8 +41,11 @@ users, organizations, organization_members, projects, project_members, tasks, co
 5. RabbitMQ Notifications
 6. Redis Caching
 7. Testing
-8. Docker Deployment
+8. Docker Deployment [Completed]
 9. CI/CD
+
+## Deployment & Execution
+DevFlow supports full containerized orchestration using Docker Compose (Spring Boot + MySQL + RabbitMQ + Redis) as well as standalone local execution for development. For full instructions on setup, environment configuration (`.env`), and commands, refer to [README.md](file:///d:/My%20Projects/Devflow%20Project/README.md).
 
 ## Future Enhancements
 Sprint Management, Calendar Integration, GitHub Integration, Team Chat, AI Task Suggestions, Time Tracking, Analytics Dashboard.
