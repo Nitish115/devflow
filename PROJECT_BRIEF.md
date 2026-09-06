@@ -34,15 +34,15 @@ Used to cache frequently accessed data such as dashboards, users, and projects, 
 users, organizations, organization_members, projects, project_members, tasks, comments, attachments, notifications, activity_logs, refresh_tokens.
 
 ## Development Roadmap
-1. Setup & JWT Authentication
-2. Organization Management
-3. Project & Task APIs
-4. Comments & Attachments
-5. RabbitMQ Notifications
-6. Redis Caching
-7. Testing
+1. Setup & JWT Authentication [Completed]
+2. Organization Management [Completed]
+3. Project & Task APIs [Completed]
+4. Comments & Attachments [Completed]
+5. RabbitMQ Notifications [Completed]
+6. Redis Caching [Completed]
+7. Testing [Completed]
 8. Docker Deployment [Completed]
-9. CI/CD
+9. CI/CD [Completed]
 
 ## Deployment & Execution
 DevFlow supports full containerized orchestration using Docker Compose (Spring Boot + MySQL + RabbitMQ + Redis) as well as standalone local execution for development. For full instructions on setup, environment configuration (`.env`), and commands, refer to [README.md](file:///d:/My%20Projects/Devflow%20Project/README.md).

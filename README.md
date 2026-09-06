@@ -1,6 +1,18 @@
 # DevFlow – Project Management & Team Collaboration Platform
 
-DevFlow is a enterprise-ready Project Management and Team Collaboration backend application built with Java 21 and Spring Boot.
+[![CI Pipeline](https://github.com/Nitish115/devflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Nitish115/devflow/actions/workflows/ci.yml)
+
+DevFlow is an enterprise-ready Project Management and Team Collaboration backend application built with Java 21 and Spring Boot.
+
+---
+
+## Continuous Integration (CI)
+
+DevFlow uses **GitHub Actions** for automated Continuous Integration on every push to `main` and pull request targeting `main`.
+
+- **Test Automation Job (`test`)**: Spins up JDK 21 Temurin, caches Maven dependencies, initializes GitHub Actions service containers (`redis:7-alpine` and `rabbitmq:3-management-alpine`), and executes `./mvnw test` (including Testcontainers-backed integration tests).
+- **Docker Build Verification Job (`docker-build`)**: Verifies multi-stage `Dockerfile` compilation cleanly on `ubuntu-latest`.
+- **Diagnostic Artifacts**: If any test fails, Surefire test execution reports are automatically uploaded as job artifacts in GitHub Actions for debugging.
 
 ---
 
