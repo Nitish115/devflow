@@ -1,0 +1,12 @@
+.git
+.gitignore
+.mvn
+target/
+uploads/
+node_modules/
+*.md
+.idea/
+.vscode/
+*.log
+.env
+.env.local
