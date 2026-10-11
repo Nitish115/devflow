@@ -1,13 +1,13 @@
 package com.devflow.devflow;
 
+import com.devflow.devflow.integration.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class DevflowApplicationTests {
+class DevflowApplicationTests extends BaseIntegrationTest {
 
 	@Test
 	void contextLoads() {
 	}
 
 }
+

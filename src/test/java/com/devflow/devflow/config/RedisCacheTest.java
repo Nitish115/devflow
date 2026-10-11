@@ -12,6 +12,7 @@ import com.devflow.devflow.organization.OrganizationService;
 import com.devflow.devflow.organization.dto.AddMemberRequest;
 import com.devflow.devflow.organization.dto.OrganizationResponse;
 import com.devflow.devflow.project.*;
+import com.devflow.devflow.integration.BaseIntegrationTest;
 import com.devflow.devflow.project.dto.ProjectResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +30,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class RedisCacheTest {
+class RedisCacheTest extends BaseIntegrationTest {
 
     @Autowired
     private CacheManager cacheManager;
