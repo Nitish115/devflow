@@ -16,7 +16,7 @@ Software teams need a centralized platform to manage projects, tasks, collaborat
 - **Documentation:** Swagger/OpenAPI
 - **Testing:** JUnit 5, Mockito
 - **DevOps:** Docker, Docker Compose, GitHub Actions
-- **Frontend (optional):** React + Tailwind CSS
+- **Frontend:** React (Vite) + Vanilla CSS Design System
 
 ## User Roles
 Organization Owner, Organization Admin, Project Manager, Developer, Viewer.
@@ -43,6 +43,7 @@ users, organizations, organization_members, projects, project_members, tasks, co
 7. Testing [Completed]
 8. Docker Deployment [Completed]
 9. CI/CD [Completed]
+10. React Frontend Client [Completed]
 
 ## Deployment & Execution
 DevFlow supports full containerized orchestration using Docker Compose (Spring Boot + MySQL + RabbitMQ + Redis) as well as standalone local execution for development. For full instructions on setup, environment configuration (`.env`), and commands, refer to [README.md](file:///d:/My%20Projects/Devflow%20Project/README.md).

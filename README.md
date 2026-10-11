@@ -94,3 +94,28 @@ To run unit and integration tests (uses Testcontainers for integration testing):
 ./mvnw test
 ```
 *(Windows: `.\mvnw.cmd test`)*
+
+---
+
+### Option C: Running the React Frontend Client
+
+The frontend client is built with React, Vite, and Lucide Icons with a dark-mode glassmorphic design system.
+
+1. **Navigate to the frontend folder**:
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the Vite development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Access the Web Application**:
+   Open [http://localhost:5173](http://localhost:5173) in your browser. All API requests to `/api` are automatically proxied to the Spring Boot backend at `http://localhost:8081`.
+
